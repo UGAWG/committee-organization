@@ -1,0 +1,136 @@
+
+# Participants:
+- Josh Krakos
+- Dmitry Kamenetskiy
+- Marshall Galbraith
+- Andrew Kercher
+
+# HiFi CFD Verification Workshop Follow on
+  - smooth body and flat plate WMLES mini session after AVIATION
+    - https://wmles.umd.edu/workshops/
+  - planning underway (test cases: RANS new SA rotation correction?)
+  - Joukowski SA-R-QCR2000
+    - cr = 1
+    - Have results from Yi and Marshall
+  - NACA0012 in WT (Dacles-Mariani)
+    - Nick generate a mesh series
+    - Yi ran most of that series (time limited)
+    - published R variant, Dacles-Mariani, new TMR update C_rot=1
+      - clarifications based of conversations with Philipe
+    - definition of wall distance: zero on slip-wall (tangency) and no-slip
+    - SA boundary condition on slip-wall (tangency), nu~ = 0
+    - QCR2020 dropped (Boris, Dmitry tried)
+    - different mesh with refine executable and SANS-refine-API-calls
+      - enforcement of no elements spanning BC types, trapped edge, trapped cell
+      - insert tet/tri centroid
+      - split edge in half
+      - split face of trapped cell
+      - Dmitry can/may look at this further with T1 + EPIC
+  - CRM-HL without brackets (Adam Clark)
+    - updated geometry Oct-2022 (truncated tail, split leading edge)
+    - Steve Karman fixed meshes, Yi running
+    - Nick has linear and curved tet-only (split LE), prism-tet upon request
+    - sharp trailing edge of fuse with large curvature
+    - separate at 13 deg, safe below 10 deg
+  - LES channel (and airfoil)
+    - https://wmles.umd.edu/workshops/workshop-2024/
+    - monthly, first-Monday meetings, noon eastern time
+    - SciTech2023 summary paper from 2022 workshop
+    - mini virtual workshop: January 13 at 10am EST (Cancelled. Deferred to conference)
+    - Mike looking at precursor flat plate simulation
+    - NACA0012, rounded trailing edge, 11 AoA
+
+# 3rd AIAA Geometry and Mesh Generation and 4th High Lift Prediction Workshops
+  - AIAA Journal Aircraft version
+    - Park ADAPT TFG submitted
+    - Marshall HO TFG submitted
+
+# SciTech 2023
+ - 23-27 January 2023 National Harbor, MD and Online
+ - Abstract Deadline: 1 June 2022 2000 hrs EDT
+ - Complete Author Review: 31 October
+ - "Unstructured Mesh Adaptation for Large Eddy Simulation with Near-Wall Treatments", Park, Li
+ - "Unstructured Mesh Adaptation with Constrained Wall-Normal Resolution", Park, Li
+ - "Sonic boom propagation with sensitivities" MIT
+ - HiFi special session papers summarizing the workshop cases
+   - RANS (boris)
+   - LES (Johan)
+ - ZJ and Nick paper on WRLES with Summit and Q2 meshes
+
+# SIAM International Meshing Roundtable Workshop 2023 (SIAM IMR23)
+ - https://internationalmeshingroundtable.com/
+ - 6-9 March 2023, Amsterdam
+ - After SIAM Conference on Computational Science and Engineering (CSE23)
+   - https://www.siam.org/conferences/cm/conference/cse23 
+
+# CFC2023 25-28 April Cannes France
+  - https://cfc2023.iacm.info/
+
+# Discussion
+- RANS adaptation
+  - Still significant work to do
+  - Gap between best metric (MOESS) and other options
+  - Timings/competitiveness with fixed meshes
+  - Reliability of error estimates
+  - Higher order solver
+    - Robustness
+    - Need to tie in higher order solvers and higher order meshes
+      - Possible benefits of higher order meshes
+    - Tighten coupling
+      - Meshing directly on curved mesh, from curved background mesh
+      - Higher order metric field
+
+- Dissipation in the FV solver has huge impact on results and solver (Joukowsky airfoil)
+- Tangential wiggles in shocks FV (and their wake) is resolved: limiters, flux function dissipation, etc.
+- Starting quad (2D) and prism (3D) insertion with refine
+- continuous err est trace(M^(-1/2)|H|M^(-1/2)) Mopt = det(|H|)^(-1/(2p+d))|H|
+- discrete error estimate integral(|Q2-Q1|)
+- is multiscale equidistributing error? tried to extend to multiple sensors
+- multiscale slow on small features (nozzle) in large domains
+- multiscale slow to discover/resolve nonlinear (transported) features
+- shocks overresolved (unless artificial dissipation limits hessian)?
+- cases with poor edge curves (and replacement with missing degeneracies)
+- Discrete surrogate with equivalent edge and pcurve parameterization P1,P2,P3
+  - discontinuous slope artifacts at coarse resolution
+  - entry to HO meshing
+- SFE nonlinear elasticity for linear and HO meshes
+- EGADS effective (virtual) topology
+  - evaluates underlying geometry derivatives, finite-difference blend region
+
+# Next Next paper ideas (or topics for graduate students)
+- linear mesh behavior for curved geometry
+- multiscale (Hessian) radial gradient becomes tangential 2nd derivative
+- does MOESS L2-norm or RANS show the same level of tangential refinement
+- P1 vs. P2 (does high order capture the solution curvature)
+- transform curved domain to Cartesian
+- transform to cylindrical coordinates?
+- scaling of shocks vs. boundary layer?
+  - adaptation to Spalding law-of-wall and shock model (tanh?)
+- metric gradation? impact on accuracy, solver convergence? 
+
+# Next virtual meeting 10:00AM Eastern US 17-NOV-2022
+- Every third Thursday going forward (via Boeing webex, Josh manage series)
+
+# Eddy Resolving Meshing
+- 
+- create unit problems for eddy-resolving adaptation, wall models, anisotropy
+ - channel and flat plate flow (make periodic with mirroring)
+- time vary analytic function to verify Barral metric
+  - does not need zero residual, should excite residual terms like real turbulence, deterministic (pseudo-random?)
+- consistency with wall model (meshing to a yplus expectation of wall model RANS+WMLES)
+  - segregate multiscale interpolation control from wall models
+  - infer yplus for instantaneous snapshots (yplus is RANS concept)
+  - enforce boundary conditions in the sensor
+- WM-RANS-SA and explicit control of y+ in RANS-SA
+- HRLES blending function to control aspect ratio to compress "gray-area"
+  - HRLES aspect ratio controlled by DDES blending
+- mesh based filter width or physics based filter width for LES
+  - fix filter width and do refinement
+  - https://arxiv.org/abs/2103.09899 
+  - "Verification and Validation: the Path to Predictive Scale-Resolving Simulations of Turbulence"
+- ratio of resolved TKE and modeled, i.e., Pope 80%
+- should tetrahedra be used at wall? mixed elements at wall or interior? solver preference
+- reached out to Johan Larsson to discuss anisotropy and wall model needs
+- Marshall + student join discussion: WMLES mesh adapt in SANS, Statistical errors
+- WMLES resolving transition, laminar separation, etc and interactions with wall models
+- define test cases and propagate to the wider community
